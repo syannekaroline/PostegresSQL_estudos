@@ -1,0 +1,319 @@
+-- PRIMEIROS PASSOS NO POSTGRESQL
+
+-- Vamos aprender comandos de:
+-- (1) Seleção; 
+-- (2) Ordenação;
+-- (3) Filtragem.
+-- (4) Criação;
+-- (5) Criação de Tabelas
+-- (6) Exclusão
+-- (7) Tabelas
+--     (7.1) Inserir dados
+--     (7.2) Atualizar dados
+--     (7.3) Excluir dados
+---------------
+
+-- 1. Comando de Seleção -> Permite selecionar os dados dentro de uma tabela
+
+-- SELECT: Sintaxe
+/*
+
+Opção 1:
+SELECT coluna1, coluna2 FROM tabela;n -> usar o comando select e selecionar as colunas esprecíficas de uma tabela
+
+Opção 2:
+SELECT * FROM tabela; --> Seleciona todas as colunas de uma tabela
+
+*/
+---------------
+
+-- Consulta 1: Selecione a tabela de produtos
+
+SELECT * FROM products;
+
+
+-- Consulta 2: Selecione a tabela de clientes
+
+SELECT * FROM customers;
+
+
+-- Consulta 3: Selecione a tabela de funcionários
+
+SELECT * FROM employees;
+
+
+-- Consulta 4: Selecione as colunas: employee_id, first_name, 
+-- last_name e address da tabela funcionários
+
+SELECT employee_id, first_name, last_name, address FROM employees
+
+
+---------------
+
+-- 2. Comando de Ordenação
+
+-- ORDER BY: Sintaxe
+
+/*
+
+SELECT * FROM tabela
+ORDER BY coluna1 DESC;
+
+obs : pode-se ordenar os valores nulos deixando-os em primeiro ou pro último 
+ex: SELECT nome_produto, descrição FROM produtos
+ORDER BY descrição NULLS FIRST | LAST;
+*/
+
+---------------
+
+-- Consulta 5: Ordene a tabela de produtos do maior para o menor preço (e vice versa)
+
+SELECT * FROM products
+ORDER BY unit_price ASC;
+
+
+-- Consulta 6: Ordene a Consulta 4 em ordem alfabética de nomes (first_name + last_name)
+
+---------------
+
+-- 3. Comandos de Filtro
+
+-- WHERE: Sintaxe
+
+/*
+
+SELECT * FROM tabela
+WHERE coluna1 = 'valor1';
+
+*/
+
+---------------
+
+-- Consulta 7: Selecione apenas os clientes do 'Brazil'.
+
+SELECT * FROM customers
+WHERE country = 'Brazil';
+
+-- WHERE + IN: Sintaxe
+
+/*
+
+SELECT * FROM tabela
+WHERE coluna1 IN ('valor1', 'valor2');
+
+*/
+
+---------------
+
+-- Consulta 8: Selecione os clientes do 'Rio de Janeiro', 'São Paulo' e 'Resende'.
+
+SELECT * FROM customers
+WHERE city IN ('Rio de Janeiro', 'Sao Paulo', 'Resende');
+
+-- 4. Comandos de criação
+
+/*
+ CREAT-> Criar um objeto qualquer
+
+estrutura :
+
+CREAT tipo_objeto nome_objeto;
+
+ex: CREAT DATABASE banco_teste;
+
+com outros parâmatros:
+
+CREAT DATABASE banco_teste
+WITH 
+OWNER = <nome do usuário que será o proprietário ex: postegres>
+ENCODING = "UTF8"
+LC_COLATE= 'pt_BR.utf-8'
+LC_CTYPE = 'pt_BR.utf-8'
+TABLESPACE = pg_default
+CONNECTION LIMIT -1;
+
+(essas acima são as opções padrão)
+*/
+---------------
+
+CREAT DATABASE banco_teste;
+
+--
+/*
+Criação de Tabelas :
+
+CREATE TABLE (
+nome_coluna tipo_dado constraints (alguma restrição se tiver)
+    nome_coluna tipo_dado constraints,
+    nome_coluna tipo_dado constraints,
+    nome_coluna tipo_dado constraints,
+);
+
+*/
+-- 5. Comandos de acesso
+
+/* GRANT comando usado pra dar permissão a usuários EM UM BANCO DE DADOS
+estrutura :
+GRANT <TIPO DE PERMISSÃO> ON <TIPO OBJETO> <NOME DO OBJETO > TO <usuário que vai ter permissão>
+ex: GRANT ALL ON DATABASE banco_teste TO fulano;
+
+*/
+---------------------
+
+-- 6. Excluir banco de dados
+
+/* estrutura
+
+DROP DATABASE <nome do banco>
+*/
+DROP DATABASE banco_teste;
+
+-- 
+/* 
+ 7 - Tabalas 
+ 
+ 7.1 - INSERIR DADOS EM TABELAS
+
+INSERT INTO nome_tabela (coluna1, coluna2, coluna3...) *se for em todas as colunas na ordem não precisa espqcificar
+VALUES (dado1, dado2, dado3...);
+
+pra valores em sequência:
+INSERT INTO nome_tabela
+VALUES
+(dado,dado,dado),
+(dado1,dado1, dado1),
+...;
+
+*/
+
+/*
+7.2 - ATUALIZAR REGISTROS EM UMA TABELA 
+
+sintaxe
+UPDATE tabela
+SET coluna = novo_valor
+WHERE coluna = valor_indice;
+
+* se for pra alterar todos os produtos não precisa especificar o whare !! MUITO CUIDADO!!!
+pode-se fazer operações ex:
+UPDATE produtos
+SET preco = preco - 4
+WHERE preco > 100;
+*/
+
+/*
+7.3 exclusão de registro de tabelas : DELETE FROM e TRUNCATE TABLE
+
+DELETE FROM : excluir linhas específicas de uma tabela
+
+sintaxe:
+
+DELETE FROM nome_tabela
+WHERE condições;
+
+TRUNCATE TABLE: Limpar os registros de uma tabela
+
+sintaxe :
+TRUNCATE TABLE nome_tabela;
+*/
+
+/*
+PostgreSQL - LIMIT e OFFSET
+
+permitem obter parte especificada das linhas retornadas por uma consulta SQL.
+
+Sintaxe:
+SELECT colunas(s)
+FROM tabela
+[ORDER BY coluna]
+[LIMIT {Contagem | ALL(padrão mostra todos)}]
+[OFFSET deslocamento (padrão 0)]
+
+contagem = quantidade de linhas a exibir
+ALL = mostrar todas as linhas
+deslocamento = quantas lonhas devem ser puladas antes de iniciar a contagem do LIMIT
+
+obs : o ORDER BY é opcional mas fortemente recomendado!
+se não usar o ODER BY a ordem será a de inserção dos produtos!
+*/
+
+-- consulta northwind : mostrar os 5 produtos mais caros --> selecionar todas as linhas, ordernar por preço, usar o limit pra mostrar apenas os 5 primeiros
+
+SELECT * FROM products
+ORDER BY unit_price DESC
+LIMIT 5
+
+-- consulta : mostar o terceiro, o quarto e o quinto produtos mais baratos
+SELECT * FROM products
+ORDER BY unit_price
+LIMIT 3
+OFFSET 2;
+
+/*
+OPERADORES DE COMPARAÇÃO NO POSTGRESQL
+
+comparar dois valores e retornar umvalor booleano, dependendo do resultado da comparação
+
+< menor que
+> maior que 
+<= menor ou igual a
+>= maior ou igual a
+= igual a
+<> ou != diferente de/não igual a
+
+*OBS : BETWEEN - consulta valores entre um intervalo
+*/
+
+-- consulta : mostrar o nome os o preço de produtos com preços unitários entre 40 e 50.
+SELECT product_name, unit_price FROM products
+WHERE unit_price >=40 AND unit_price <=50;
+
+-- consulta : mostrar todos os produtos exeto os que custam 10;
+SELECT product_name, unit_price FROM products
+WHERE unit_price <> 10;
+
+/*
+OPERADOR BETWEEN - postgreSQL 
+
+operador de Comparação
+permite visualizar resultados de colsultas como um siltro de INTERVALOS DE DADOS
+
+sintax:
+SELECT...
+FROM...
+WHERE coluna (NOT)BETWEEN valor1 AND valor2;
+
+*/
+
+--consulta : mostrar o nome e os preços dos produtos com valor entre 40 e 50;
+SELECT product_name, unit_price FROM products
+WHERE unit_price BETWEEN 40 AND 50;
+
+--consulta : mostrar os nomes dos produtos e seus respectivos preços que devem estar entre 3.50 e 5 ou entre 10 e 20 de forma ascendentemente ordenada
+SELECT product_name, unit_price FROM products
+WHERE 
+	unit_price BETWEEN 3.50 AND 5 OR
+	unit_price BETWEEN 10 AND 20
+ORDER BY unit_price;
+
+--consulta : mostrar o nome dos produtos mais baratos (valor menor q 10) que estão acabando no estoque (menos de 10 unidades)
+
+SELECT product_name, unit_price, units_in_stock FROM products
+WHERE 
+	unit_price < 10 AND -- mais baratos
+	units_in_stock <10
+ORDER BY unit_price;
+
+--consulta : mostrar o nome dos produtos mais baratos (valor menor q 10) que vão precisar de reposição no estoque (quantidade está entre 5 e 20)
+SELECT product_name, unit_price, units_in_stock FROM products
+WHERE 
+	unit_price < 10 AND -- mais baratos
+	units_in_stock BETWEEN 5 AND 30
+ORDER BY unit_price;
+
+--consulta : mostrar os produtos cujo valores estão não estão entre a faixa de 2 e 12 reais.
+SELECT product_name, unit_price, units_in_stock FROM products
+WHERE 
+	unit_price < 10 AND -- mais baratos
+	units_in_stock BETWEEN 5 AND 30
+ORDER BY unit_price;
